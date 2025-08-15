@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butterfly Flight - Enhanced Flappy Bird</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2 data-translate="loading">Loading...</h2>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen hidden">
+        <div class="menu-content">
+            <h1 class="game-title" data-translate="gameTitle">Butterfly Flight</h1>
+            <div class="menu-buttons">
+                <button id="play-btn" class="menu-btn primary" data-translate="play">Play</button>
+                <button id="shop-btn" class="menu-btn" data-translate="shop">Shop</button>
+                <button id="daily-challenge-btn" class="menu-btn" data-translate="dailyChallenge">Daily Challenge</button>
+                <button id="settings-btn" class="menu-btn" data-translate="settings">Settings</button>
+            </div>
+            <div class="stats-display">
+                <div class="stat-item">
+                    <span data-translate="highScore">High Score</span>
+                    <span id="high-score-display">0</span>
+                </div>
+                <div class="stat-item">
+                    <span data-translate="totalCoins">Total Coins</span>
+                    <span id="total-coins-display">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Canvas Container -->
+    <div id="game-container" class="screen hidden">
+        <canvas id="game-canvas"></canvas>
+        <div class="game-ui">
+            <div class="top-ui">
+                <button id="pause-btn" class="ui-btn">⏸</button>
+                <div class="score-display">
+                    <span data-translate="score">Score</span>: <span id="current-score">0</span>
+                </div>
+                <div class="coins-display">
+                    <span>🪙</span> <span id="current-coins">0</span>
+                </div>
+            </div>
+            <div class="mobile-controls">
+                <button id="flap-btn" class="flap-button" data-translate="tap">TAP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pause Menu -->
+    <div id="pause-menu" class="overlay hidden">
+        <div class="overlay-content">
+            <h2 data-translate="paused">Game Paused</h2>
+            <div class="menu-buttons">
+                <button id="resume-btn" class="menu-btn primary" data-translate="resume">Resume</button>
+                <button id="restart-btn" class="menu-btn" data-translate="restart">Restart</button>
+                <button id="main-menu-btn" class="menu-btn" data-translate="mainMenu">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over" class="overlay hidden">
+        <div class="overlay-content">
+            <h2 data-translate="gameOver">Game Over</h2>
+            <div class="game-over-stats">
+                <div class="stat-item">
+                    <span data-translate="finalScore">Final Score</span>
+                    <span id="final-score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span data-translate="coinsEarned">Coins Earned</span>
+                    <span id="coins-earned">0</span>
+                </div>
+                <div class="stat-item" id="new-high-score" class="hidden">
+                    <span data-translate="newHighScore">New High Score!</span>
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button id="retry-btn" class="menu-btn primary" data-translate="retry">Retry</button>
+                <button id="shop-btn-gameover" class="menu-btn" data-translate="shop">Shop</button>
+                <button id="change-theme-btn" class="menu-btn" data-translate="changeTheme">Change Theme</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shop-screen" class="screen hidden">
+        <div class="shop-content">
+            <div class="shop-header">
+                <h2 data-translate="shop">Shop</h2>
+                <button id="shop-close-btn" class="close-btn">×</button>
+                <div class="coins-display">
+                    <span>🪙</span> <span id="shop-coins">0</span>
+                </div>
+            </div>
+            <div class="shop-categories">
+                <button class="category-btn active" data-category="skins" data-translate="skins">Skins</button>
+                <button class="category-btn" data-category="themes" data-translate="themes">Themes</button>
+            </div>
+            <div id="shop-items" class="shop-items"></div>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="screen hidden">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2 data-translate="settings">Settings</h2>
+                <button id="settings-close-btn" class="close-btn">×</button>
+            </div>
+            <div class="settings-groups">
+                <div class="settings-group">
+                    <h3 data-translate="audio">Audio</h3>
+                    <div class="setting-item">
+                        <label data-translate="music">Music</label>
+                        <input type="range" id="music-volume" min="0" max="100" value="70">
+                        <button id="music-toggle" class="toggle-btn">🔊</button>
+                    </div>
+                    <div class="setting-item">
+                        <label data-translate="soundEffects">Sound Effects</label>
+                        <input type="range" id="sfx-volume" min="0" max="100" value="80">
+                        <button id="sfx-toggle" class="toggle-btn">🔊</button>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3 data-translate="display">Display</h3>
+                    <div class="setting-item">
+                        <label data-translate="theme">Theme</label>
+                        <select id="theme-select">
+                            <option value="pastel-clouds" data-translate="pastelClouds">Pastel Clouds</option>
+                            <option value="neon-cyberpunk" data-translate="neonCyberpunk">Neon Cyberpunk</option>
+                            <option value="egyptian-dusk" data-translate="egyptianDusk">Egyptian Dusk</option>
+                            <option value="watercolor-forest" data-translate="watercolorForest">Watercolor Forest</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label data-translate="language">Language</label>
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="ar">العربية</option>
+                            <option value="fr">Français</option>
+                            <option value="es">Español</option>
+                            <option value="de">Deutsch</option>
+                            <option value="it">Italiano</option>
+                            <option value="pt">Português</option>
+                            <option value="ru">Русский</option>
+                            <option value="ja">日本語</option>
+                            <option value="zh">中文</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Challenge Screen -->
+    <div id="daily-challenge-screen" class="screen hidden">
+        <div class="challenge-content">
+            <div class="challenge-header">
+                <h2 data-translate="dailyChallenge">Daily Challenge</h2>
+                <button id="challenge-close-btn" class="close-btn">×</button>
+            </div>
+            <div class="challenge-info">
+                <div class="challenge-description">
+                    <h3 id="challenge-title">Collect 20 coins in a single run</h3>
+                    <p id="challenge-desc" data-translate="challengeDesc">Complete today's challenge to earn bonus coins!</p>
+                </div>
+                <div class="challenge-reward">
+                    <span data-translate="reward">Reward</span>: <span id="challenge-reward">50</span> 🪙
+                </div>
+                <div class="challenge-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="challenge-progress"></div>
+                    </div>
+                    <span id="challenge-progress-text">0/20</span>
+                </div>
+            </div>
+            <button id="start-challenge-btn" class="menu-btn primary" data-translate="startChallenge">Start Challenge</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="translations.js"></script>
+    <script src="audio-manager.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
